@@ -21,7 +21,7 @@ def get_right_length(node):
 def get_height(node):
     if not node:
         return 0
-    return 1+max(get_height(node.left, node.right))
+    return 1+max(get_height(node.left),get_height( node.right))
 
 
 def get_node_count(node):
