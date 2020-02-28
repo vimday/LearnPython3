@@ -1,33 +1,31 @@
-__author__ = 'vimday'
-
-
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 import numpy as np
 
-
 def get_left_length(node):
     if not node:
         return 0
-    return max(1+get_left_length(node.left), get_left_length(node.right)-1)
+    if not node.left:
+        return 1
+    if not node.right:
+        return 2 + get_left_length(node.right)
+    return 2 + get_left_length(node.left)
 
 
 def get_right_length(node):
     if not node:
         return 0
-    return max(1+get_right_length(node.right), get_left_length(node.left)-1)
-
+    return 1 + get_right_length(node.right)
 
 def get_height(node):
     if not node:
         return 0
-    return 1+max(get_height(node.left),get_height( node.right))
-
+    return 1 + max([get_height(node.left), get_height(node.right)])
 
 def get_node_count(node):
     if not node:
         return 0
-    return 1+get_node_count(node.left)+get_node_count(node.right)
+    return 1 + get_node_count(node.left) + get_node_count(node.right)
 
 
 def get_fontsize(count):
@@ -44,16 +42,16 @@ def show_node(node, ax, height, index, font_size):
     x1, y1 = None, None
     if node.left:
         x1, y1, index = show_node(node.left, ax, height-1, index, font_size)
-    x = 100*index-50
-    y = 100*height-50
+    x = 100 * index - 50
+    y = 100 * height - 50
     if x1:
-        plt.plot((x1, x), (y1, y), linewidth=2.0, color='b')
+        plt.plot((x1, x), (y1, y), linewidth=2.0,color='b')
     circle_color = "black" if node.is_black_node() else 'r'
     text_color = "beige" if node.is_black_node() else 'black'
     ax.add_artist(plt.Circle((x, y), 50, color=circle_color))
-    ax.add_artist(plt.Text(x, y, node.val, color=text_color, fontsize=font_size,
-                           horizontalalignment="center", verticalalignment="center"))
+    ax.add_artist(plt.Text(x, y, node.val, color= text_color, fontsize=font_size, horizontalalignment="center",verticalalignment="center"))
     # print(str(node.val), (height, index))
+
     index += 1
     if node.right:
         x1, y1, index = show_node(node.right, ax, height-1, index, font_size)
@@ -103,4 +101,4 @@ def save_rb_tree(tree, index):
     show_node(tree, ax, height, 1, get_fontsize(get_node_count(tree)))
 
     fig.set_size_inches(10, h/(w/10))
-    plt.savefig("rb\\rbtree_{}.png".format(index))
+    plt.savefig("rb/rbtree_{}.png".format(index))

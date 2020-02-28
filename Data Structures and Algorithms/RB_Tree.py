@@ -3,7 +3,7 @@ __author__ = 'vimday'
 
 import random
 import functools
-from tree_help import show_rb_tree, save_rb_tree
+from tree_plt import show_rb_tree, save_rb_tree
 
 
 class RBNode:
@@ -74,6 +74,18 @@ class RBTree:
         self.root = None
         self.index = 1
         self.action = ""
+        self._hot=None
+    
+    def printTree(self):
+        if not self.root:
+            return
+        self.printNode(self.root)
+    def printNode(self,node):
+        if not node:
+            return
+        self.printNode(node.left)
+        print(node.val,node.color)
+        self.printNode(node.right)
 
     def rotateAt(self, v):
         '''
@@ -123,6 +135,7 @@ class RBTree:
         lf.parent = g
         g.right = rf
         rf.parent = g
+        print(g.val,"rotated as new g")
         return g
 
     def left_rotate(self, node):
@@ -233,6 +246,7 @@ class RBTree:
                     cur.left = node
                     break
                 cur = cur.left
+                continue
             return False
         if node.parent.is_black_node():
             return
@@ -240,7 +254,7 @@ class RBTree:
         self.solve_double_red(node)
         return "solved double red"
 
-    @tree_log
+    #@tree_log
     def solve_double_red(self, node):
         if self.root == node:
             self.root.set_black_node()
@@ -266,7 +280,7 @@ class RBTree:
                 p.set_black_node()
                 u.set_black_node()
                 g.set_red_node()
-                self.solve_doble_red(g)
+                self.solve_double_red(g)
                 return
             # case 1,2
             elif node == p.right:
@@ -299,8 +313,9 @@ class RBTree:
             return
 
     def add_node(self, node):
-        self.action = 'inser node {}'.format(node.val)
+        #self.action = 'inser node {}'.format(node.val)
         self.insert_node(node)
+        save_rb_tree(self.root, "{}_insert_after".format(node.val))
         pass
 
     def real_delete_node(self, node):
@@ -375,51 +390,72 @@ class RBTree:
 
     def delete_node(self, node):
         node_color = node.color
+        val=node.val
         if not node.left:
             # 没有左子树 则直接用右子树代替该节点
+            self._hot=node.parent
             succ_node = node.right
             self.transplant(node, succ_node)
         elif not node.right:
             succ_node = node.left
+            self._hot=node.parent
             self.transplant(node, succ_node)
         else:
             # 既有左子又有右子，取右子中的最小者替代该节点
             new_node = self.findRightMin(node)
-
+            self._hot=new_node.parent
             node_color = new_node.color
             succ_node = new_node.right
+            node.val=new_node.val
             if new_node.parent != node:
+                new_node.parent.left=succ_node
                 # 用new_node的后继取代newnode,并将newnode作为node右子树的根
-                self.transplant(new_node, succ_node)
-                new_node.right = node.right
-                new_node.right.parent = new_node
-            # 此时此时以newnode为根的右子树，已完全平衡，可以取代node且不影响平衡
-            self.transplant(node, new_node)
+                # self.transplant(new_node, succ_node)
+                # new_node.right = node.right
+                # new_node.right.parent = new_node
+            
+                    # 此时此时以newnode为根的右子树，已完全平衡，可以取代node且不影响平衡
+                #self.transplant(node, new_node)
+            else:
+                new_node.parent.right=succ_node
+            if succ_node:
+                succ_node.parent=self._hot
             # 以下代码不能封装到transplant中 ，容易成环，transplant的取代是向上取代
-            new_node.left = node.left
-            new_node.left.parent = new_node
-            new_node.color = node.color
+            # new_node.left = node.left
+            # new_node.left.parent = new_node
+            # new_node.color = node.color
         if not self.root:
             return
         if self.root == succ_node:
+
             self.root.set_black_node()
             return
         # 没有后继节点，x为底层节点
         # 若x为红色节点可直接删除，此时node_color为原x的颜色，若为黑色，则需调整
-        if not succ_node:
-            succ_node = node
+        #if not succ_node:
+        #    succ_node = node
         if node_color == "B":
-            self.solve_doble_black(succ_node)
+            save_rb_tree(self.root, "{}_delete_mid".format(val))
+            self.solve_double_black(succ_node)
 
-    def solve_doble_black(self, cur):
-        if cur.is_red_node() or self.root == cur:
-            cur.set_black_node()
-            return
+    def solve_double_black(self, cur):
+
+        #if cur.is_red_node() or self.root == cur:
+        #    cur.set_black_node()
+        #    return
         # 此时 x,r(succ,x的后继者)均为黑色
         # 摘除 x(原new_node）后 黑深度不再统一，等效于B树中x所属节点发生下溢
         # 此时原x(现r)必非根
-        p = cur.parent  # 原x的父亲
-        if p.left == cur:
+        if cur:
+            if cur.is_red_node() or self.root==cur:
+                cur.set_black_node()
+                return
+            p = cur.parent  # 原x的父亲
+        else :
+            p=self._hot
+        if not p:
+            return
+        if p.left == cur or p.left==None:
             s = p.right
         else:
             s = p.left
@@ -438,13 +474,18 @@ class RBTree:
                 p_old_color = p.color
                 # 备份原子树根节点p颜色，并对t及其父亲、祖父
                 # 以下，通过旋转重平衡，并将新子树的左、右孩子染黑
+                pp=p.parent
                 new_root = self.rotateAt(t)
-                if self.root == p:
-                    self.root = p
-                elif p.parent.left == p:
-                    p.parent.left = new_root
+                # print("-------------new_root------------")
+                # self.printNode(new_root)
+                # print("----------------------------")
+
+                if not pp:
+                    self.root = new_root
+                elif pp.left == p:
+                    pp.left = new_root
                 else:
-                    p.parent.right = new_root
+                    pp.right = new_root
                 new_root.left.set_black_node()
                 new_root.right.set_black_node()
                 new_root.color = p_old_color
@@ -472,14 +513,16 @@ class RBTree:
             else:
                 t = s.right
             # 对t及其父亲、祖父做平衡调整
-            new_root = rotateAt(t)
-            if p == self.root:
+            pp=p.parent
+            new_root = self.rotateAt(t)
+            if not pp:
                 self.root = new_root
-            elif p == p.parent.left:
-                p.parent.left = new_root
+            elif pp.left == p:
+                pp.left = new_root
             else:
-                p.parent.right = new_root
+                pp.right = new_root
             # 继续修正r处双黑——此时的p已转红，故后续只能是BB-1或BB-2R
+            self._hot=p
             self.solve_double_black(cur)
 
     def delete_val(self,val):
@@ -498,7 +541,10 @@ if __name__ == '__main__':
     random.shuffle(data)
     print(data)
     for i in data:
+        print(i)
         tree.add_node(RBNode(i))
+    
+    tree.printTree()
 
     random.shuffle(data)
     for i in data:
