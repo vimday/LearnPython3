@@ -75,7 +75,7 @@ class RBTree:
         self.index = 1
         self.action = ""
         self._hot=None
-    
+
     def printTree(self):
         if not self.root:
             return
@@ -413,7 +413,7 @@ class RBTree:
                 # self.transplant(new_node, succ_node)
                 # new_node.right = node.right
                 # new_node.right.parent = new_node
-            
+
                     # 此时此时以newnode为根的右子树，已完全平衡，可以取代node且不影响平衡
                 #self.transplant(node, new_node)
             else:
@@ -543,7 +543,7 @@ if __name__ == '__main__':
     for i in data:
         print(i)
         tree.add_node(RBNode(i))
-    
+
     tree.printTree()
 
     random.shuffle(data)
