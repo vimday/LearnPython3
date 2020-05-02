@@ -1,0 +1,84 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "BuildWithC++17",
+            "command": "g++",
+            "args": [
+                "-g",
+                "-std=c++17",
+                "-lm",
+                "${file}",
+                "-o",
+                "E:/Cpp/exe/${fileBasenameNoExtension}.exe",
+                "-D LOCAL"
+            ],
+            "type": "shell",
+            "presentation": {
+                "reveal": "silent",
+                "echo": false,
+                "focus": false
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": "absolute",
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Build",
+            "command": "g++",
+            "args": [
+                "-g",
+                "-Wall",
+                "-std=c++11",
+                "-lm",
+                "${file}",
+                "-o",
+                "E:/Cpp/exe/${fileBasenameNoExtension}.exe"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "echo": false,
+                "focus": true
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": "absolute",
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+    
+        {
+            "label": "Run",
+            "type": "shell",
+            "dependsOn": "Build",
+            "command": "${fileDirname}/${fileBasenameNoExtension}.exe",
+            "args": [],
+            "presentation": {
+                "reveal": "always",
+                "focus": true
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        }
+    ]
+    
+}
