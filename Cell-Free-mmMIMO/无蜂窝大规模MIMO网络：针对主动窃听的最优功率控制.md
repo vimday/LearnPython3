@@ -43,10 +43,9 @@
 
 表示法：[·] T，[·] *和[·]†分别表示转置运算符，共轭运算符和厄米运算符。[·] -1和[·] +表示逆运算符和伪逆运算符 分别。 向量和矩阵分别用小写黑体和大写黑体表示。然后，In 是单位矩阵。”||·||”表示欧几里得范数。E{·}表示期望值。 ̄zand协方差矩阵Σ∈Cn×n。
 
-![image-20200428231321791](C:\Users\lwftx\AppData\Roaming\Typora\typora-user-images\image-20200428231321791.png)
-
+![pics](pics/note.jpg)
 ## 无蜂窝系统模型
 
 我们考虑一个具有主动窃听者（Eve）的M个用户接入点和K个users的系统。 每个节点都配备有单个天线，并且所有节点都是随机放置的
 
- ![image-20200428232130275](C:\Users\lwftx\AppData\Roaming\Typora\typora-user-images\image-20200428232130275.png)
+ ![pics](./pics/Xnip2020-05-06_21-56-59.jpg)
